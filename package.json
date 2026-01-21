@@ -1,0 +1,16 @@
+{
+  "name": "smokeballarchie",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+  "test": "playwright test"
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@types/node": "^24.3.1"
+  }
+}
