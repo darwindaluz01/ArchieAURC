@@ -1,6 +1,6 @@
 pipeline {
     
-agent { label 'Automation Node 1' }
+agent { label 'Automation Node 2' }
     
 
     
