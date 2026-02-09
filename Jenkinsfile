@@ -1,6 +1,12 @@
 pipeline {
-    agent any
-
+agent { label 'Automation Node 1' }
+    
+    tools {
+        // This tells Jenkins to install Node automatically
+        // Note: 'node' must be configured in Jenkins Global Tool Configuration
+        nodejs 'node' 
+    }
+    
     stages {
         stage('Clean workspace') {
             steps {
