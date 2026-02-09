@@ -19,11 +19,13 @@ agent { label 'Automation Node 1' }
                 checkout scm
             }
         }
-        stage('Install dependencies') {
-            steps {
-                bat 'npm ci'
-            }
+stage('Install dependencies') {
+    steps {
+        withEnv(['PATH+NODE=C:\\nodejs']) {
+            bat 'npm ci'
         }
+    }
+}
         stage('Install Playwright browsers') {
             steps {
                 bat 'npx playwright install'
