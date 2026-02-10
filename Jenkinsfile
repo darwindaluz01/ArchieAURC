@@ -1,59 +1,40 @@
 pipeline {
-    
-agent { label 'Automation Node 2' }
-    
+    agent {
+        docker {
+            image 'mcr.microsoft.com/playwright:v1.42.1-jammy'
+            args '--ipc=host'
+        }
+    }
 
-    
-    stages {
-        stage('Clean workspace') {
-            steps {
-                deleteDir()
-            }
-        }
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-stage('Install dependencies') {
-    steps {
-        withEnv(['PATH+NODE=C:\\nodejs']) {
-            bat 'npm ci'
-        }
-    }
-}
-        stage('Install Playwright browsers') {
-            steps {
-                bat 'npx playwright install'
-            }
-        }
-        stage('Run Playwright tests') {
-            steps {
-                //bat 'npx playwright test --headed --reporter=html'
-                bat 'npx playwright test --reporter=html'
-            }
-        }
+    stages {
+        stage('Clean workspace') {
+            steps {
+                deleteDir()
+            }
+        }
 
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
-        /*
-        stage('Wait before publishing report') {
-            steps {
-                // Wait 5 seconds to ensure all files are closed
-                sleep(time: 5, unit: 'SECONDS')
-            }
-        }
-        stage('Publish HTML report') {
-            steps {
-                publishHTML (target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report'
-                ])
-            }
-        }
-        */
-    }
+        stage('Install dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+
+        stage('Run Playwright tests') {
+            steps {
+                sh 'npx playwright test --reporter=html'
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+        }
+    }
 }
