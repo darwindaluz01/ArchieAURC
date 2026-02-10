@@ -2,22 +2,22 @@ pipeline {
 agent { label 'docker' }
 stages {
 stage('Clean workspace') {
-            steps {
+steps {
                 deleteDir()
             }
         }
 stage('Checkout') {
-            steps {
+steps {
                 checkout scm
             }
         }
 stage('Install dependencies') {
-            steps {
+steps {
                 sh 'npm ci'
             }
         }
 stage('Run Playwright tests') {
-            steps {
+steps {
                 sh 'npx playwright test --reporter=html'
             }
         }
