@@ -1,5 +1,8 @@
 pipeline {
-    agent any
+    agent {
+        node {
+           label '1'
+    }
 
     stages {
         stage('Clean workspace') {
