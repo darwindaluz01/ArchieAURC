@@ -1,36 +1,54 @@
 pipeline {
-    agent {
-        docker {
-            image 'mcr.microsoft.com/playwright:v1.41.0-jammy'
-            label 'docker'
-        }
-    }
-    
+    agent any
+
     stages {
+        stage('Clean workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Install dependencies') {
             steps {
-                // Installs only what is in package-lock.json
-                sh 'npm ci'
+                bat 'npm ci'
             }
         }
-        
+        stage('Install Playwright browsers') {
+            steps {
+                bat 'npx playwright install'
+            }
+        }
         stage('Run Playwright tests') {
             steps {
-                sh 'npx playwright test --reporter=html'
+                //bat 'npx playwright test --headed --reporter=html'
+                bat 'npx playwright test --reporter=html'
             }
         }
-    }
-    
-    post {
-        always {
-            // This only runs if the node was successfully allocated
-            script {
-                try {
-                    archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
-                } catch (Exception e) {
-                    echo "Could not archive artifacts, likely because the build failed before starting."
-                }
+
+
+        /*
+        stage('Wait before publishing report') {
+            steps {
+                // Wait 5 seconds to ensure all files are closed
+                sleep(time: 5, unit: 'SECONDS')
             }
         }
+        stage('Publish HTML report') {
+            steps {
+                publishHTML (target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Test Report'
+                ])
+            }
+        }
+        */
     }
 }
