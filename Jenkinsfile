@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-        docker {
-            image 'mcr.microsoft.com/playwright:v1.42.1-jammy'
-            args '--ipc=host'
-        }
-    }
+agent { label 'docker' }
 
     stages {
         stage('Clean workspace') {
