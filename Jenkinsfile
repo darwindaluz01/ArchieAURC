@@ -1,24 +1,21 @@
 pipeline {
     agent {
         docker {
-            image 'mcr.microsoft.com/playwright:v1.41.0-jammy' // Uses a specific Playwright version
-            label 'docker' // Still runs on your docker-enabled node
+            image 'mcr.microsoft.com/playwright:v1.41.0-jammy'
+            label 'docker'
         }
     }
     
     stages {
-        // You can remove the 'Clean workspace' and 'Checkout' stages 
-        // if you want, as Jenkins does this automatically at the start.
-        
         stage('Install dependencies') {
             steps {
+                // Installs only what is in package-lock.json
                 sh 'npm ci'
             }
         }
         
         stage('Run Playwright tests') {
             steps {
-                // We use 'npx playwright test' here
                 sh 'npx playwright test --reporter=html'
             }
         }
@@ -26,7 +23,14 @@ pipeline {
     
     post {
         always {
-            archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+            // This only runs if the node was successfully allocated
+            script {
+                try {
+                    archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+                } catch (Exception e) {
+                    echo "Could not archive artifacts, likely because the build failed before starting."
+                }
+            }
         }
     }
 }
