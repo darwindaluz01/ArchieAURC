@@ -1,58 +1,37 @@
 pipeline {
-agent {
+    agent {
         docker {
             image 'mcr.microsoft.com/playwright:v1.41.0-jammy'
             label 'docker'
         }
     }
+
     stages {
-        stage('Clean workspace') {
-            steps {
-                deleteDir()
-            }
-        }
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Install dependencies') {
             steps {
-                bat 'npm ci'
+                // Changed 'bat' to 'sh'
+                sh 'npm ci'
             }
         }
+
         stage('Install Playwright browsers') {
             steps {
-                bat 'npx playwright install'
+                // Changed 'bat' to 'sh'
+                sh 'npx playwright install'
             }
         }
+
         stage('Run Playwright tests') {
             steps {
-                //bat 'npx playwright test --headed --reporter=html'
-                bat 'npx playwright test --reporter=html'
+                // Changed 'bat' to 'sh'
+                sh 'npx playwright test --reporter=html'
             }
         }
+    }
 
-
-        /*
-        stage('Wait before publishing report') {
-            steps {
-                // Wait 5 seconds to ensure all files are closed
-                sleep(time: 5, unit: 'SECONDS')
-            }
+    post {
+        always {
+            archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
         }
-        stage('Publish HTML report') {
-            steps {
-                publishHTML (target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report'
-                ])
-            }
-        }
-        */
     }
 }
