@@ -1,7 +1,7 @@
 pipeline {
 agent { label 'docker' }
 stages {
-        stage('Clean workspace') {
+stage('Clean workspace') {
             steps {
                 deleteDir()
             }
