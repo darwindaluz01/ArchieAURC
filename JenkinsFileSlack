@@ -1,0 +1,49 @@
+pipeline {
+    agent {
+        node {
+           label '1'
+        }
+    }
+    stages {
+        stage('Clean workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Install dependencies') {
+            steps {
+                bat 'npm ci'
+            }
+        }
+        stage('Install Playwright browsers') {
+            steps {
+                bat 'npx playwright install'
+            }
+        }
+        stage('Run Playwright tests') {
+            steps {
+                bat 'npx playwright test --reporter=html'
+            }
+        }
+    }
+
+    post {
+        success {
+            slackSend color: 'good', 
+                      message: "✅ Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
+        }
+        failure {
+            slackSend color: 'danger', 
+                      message: "❌ Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
+        }
+        always {
+            // This ensures your report is still saved even if notification fails
+            archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+        }
+    }
+}
