@@ -1,33 +1,28 @@
 pipeline {
 agent { label 'docker' }
-
-    stages {
+stages {
         stage('Clean workspace') {
             steps {
                 deleteDir()
             }
         }
-
-        stage('Checkout') {
+stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-
-        stage('Install dependencies') {
+stage('Install dependencies') {
             steps {
                 sh 'npm ci'
             }
         }
-
-        stage('Run Playwright tests') {
+stage('Run Playwright tests') {
             steps {
                 sh 'npx playwright test --reporter=html'
             }
         }
     }
-
-    post {
+  post {
         always {
             archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
         }
