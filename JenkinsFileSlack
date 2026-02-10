@@ -33,14 +33,17 @@ pipeline {
     }
 
     post {
-        success {
-            slackSend color: 'good', 
-                      message: "✅ Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
-        }
-        failure {
-            slackSend color: 'danger', 
-                      message: "❌ Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}] (${env.BUILD_URL})"
-        }
+success {
+        slackSend color: 'good', 
+                  channel: '#archie-jenkins-result', // Or use the ID like 'C0123456789'
+                  message: "✅ Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+    }
+    failure {
+        slackSend color: 'danger', 
+                  channel: '#archie-jenkins-result',
+                  message: "❌ Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+    }
+}
         always {
             // This ensures your report is still saved even if notification fails
             archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
